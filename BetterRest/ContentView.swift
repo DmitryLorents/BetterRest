@@ -19,31 +19,34 @@ struct ContentView: View {
     
     var body: some View {
         NavigationStack {
-            VStack {
-                Text("When do you want to wake up?")
-                    .font(.headline)
+            Form {
+                Section("When do you want to wake up?") {
+                    DatePicker("Please enter a time", selection: $wakeup, displayedComponents: .hourAndMinute)
+                }
                 
-                DatePicker("Please enter a time", selection: $wakeup, displayedComponents: .hourAndMinute)
-                    .labelsHidden()
+                Section("Desired amount of sleep") {
+                    Stepper("\(sleepAmount.formatted()) hours", value: $sleepAmount, in: 4...12, step: 0.25)
+                }
                 
-                Text("Desired amount of sleep")
-                    .font(.headline)
-                
-                Stepper("\(sleepAmount.formatted()) hours", value: $sleepAmount, in: 4...12, step: 0.25)
-                
-                Text("Daily cofee intake")
-                    .font(.headline)
-                
-                Stepper("\(cofeeAmount) cup(s)", value: $cofeeAmount, in: 1...20)
+                Section("Daily cofee intake") {
+                    Picker("Cups amount", selection: $cofeeAmount) {
+                        ForEach(0..<21) {
+                            Text("\($0) cup(s)").tag($0)
+                        }
+                    }
+                    Stepper("\(cofeeAmount) cup(s)", value: $cofeeAmount, in: 1...20)
+                }
             }
             .padding()
             .toolbar {
                 Button("Calculate", action: calculateBadTime)
+                    .opacity(isAlertShown ? 0 : 1)
             }
             .alert(alertTitle, isPresented: $isAlertShown) {
                 Button("OK") {}
             } message: {
                 Text(alertMessage)
+                    .font(.headline)
             }
             .navigationTitle("BetterRest")
             .navigationBarTitleDisplayMode(.inline)
